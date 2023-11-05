@@ -2,7 +2,7 @@ import numpy as np
 from typing import Callable
 
 
-class MyDecisionTree:
+class DecisionTree:
     """
     Implements the Decision Tree algorithm for binary classification.
     :attrs:
