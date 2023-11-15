@@ -71,7 +71,7 @@
             1.0 \\ 1.0 \\ 1.0
         \end{bmatrix}
     \end{equation*}
-    The bias terms are initialized to zero. We use ReLU activation with a learning rate of $\eta = 0.1$.
+    The bias terms are initialized to zero. We use ReLU activation with a learning rate of $\eta = 0.01$.
     The given dataset is
     \begin{equation*}
         \mathbf{x} = \begin{bmatrix}
@@ -114,90 +114,91 @@
     \end{equation}
 
     \subsubsection*{Iteration \#1 (Backward Pass)}
-    For the backward pass, we first find the gradient of the loss with respect to the output
+    For the backward pass, we first find the gradients of the loss with respect to the output layer weights. This is given by
     \begin{align*}
-        \frac{\partial \mathcal{L}}{\partial \mathbf{y}} &= \frac{1}{3} \sum_{i=1}^{3} \frac{\partial}{\partial \mathbf{y}} (\hat{y}_{i} - y_{i})^{2} \\
-        &= \frac{1}{3} \sum_{i=1}^{3} 2 (\hat{y}_{i} - y_{i}) \frac{\partial}{\partial \mathbf{y}} (\hat{y}_{i} - y_{i}) \\
-        &= \frac{-2}{3} \begin{bmatrix}
-            3.6 - 3.0 & 2.4 - 2.5 & 6.0 - 4.0
+        \frac{\partial \mathcal{L}}{\partial W_{2}} &= \left( \frac{\partial \mathbf{y}}{\partial W_{2}} \right)^{T} \frac{\partial \mathcal{L}}{\partial \mathbf{y}} \\
+        \frac{\partial \mathbf{y}}{\partial W_{2}} &= \frac{\partial}{\partial W_{2}} (A_{1} W_{2} + b) = A_{1} \\
+        \frac{\partial \mathcal{L}}{\partial \mathbf{y}} = \frac{1}{3} \sum_{i=1}^{3} \frac{\partial}{\partial \mathbf{y}} (\hat{y}_{i} - y_{i})^{2}
+        &= \frac{1}{3} \sum_{i=1}^{3} 2 (\hat{y}_{i} - y_{i}) \frac{\partial}{\partial \mathbf{y}} (\hat{y}_{i} - y_{i}) = \frac{2}{3} \begin{bmatrix}
+            3.6 - 3.0 \\ 2.4 - 2.5 \\ 6.0 - 4.0
         \end{bmatrix} = \begin{bmatrix}
-            0.4 & -0.06 & 1.34
+            -0.4 \\ 0.06 \\ -1.34
         \end{bmatrix}
-    \end{align*}
-    Then, we find the gradients of the loss with respect to the output layer weights
-    and bias. This is given by
-    \begin{align*}
-        \frac{\partial \mathcal{L}}{\partial W_{2}} &= \left( \frac{\partial \mathcal{L}}{\partial \mathbf{y}} \frac{\partial \mathbf{y}}{\partial W_{2}} \right)^{T} \\
-        \frac{\partial \mathbf{y}}{\partial W_{2}} &= \frac{\partial}{\partial W_{2}} (A_{1} W_{2} + b) = A_{1}^{T}
     \end{align*}
     So, updated weights $W_{2}$ are
     \begin{align*}
-        W_{2} &= W_{2} - \eta \frac{\partial \mathcal{L}}{\partial W_{2}} \\
-        &= W_{2} - \eta \left( \begin{bmatrix}
-            0.4 & -0.06 & 1.34
-        \end{bmatrix} \begin{bmatrix}
+        W_{2} = W_{2} - \eta \frac{\partial \mathcal{L}}{\partial W_{2}}
+        = W_{2} - \eta \begin{bmatrix}
             1.2 & 0.8 & 2.0 \\
             1.2 & 0.8 & 2.0 \\
             1.2 & 0.8 & 2.0
-        \end{bmatrix} \right)^{T} = \begin{bmatrix}
-            1.0 \\ 1.0 \\ 1.0
-        \end{bmatrix} - 0.1 \begin{bmatrix}
-            2.016 \\ 1.344 \\ 3.36
+        \end{bmatrix} \begin{bmatrix}
+            0.4 \\ -0.06 \\ 1.34
         \end{bmatrix} = \begin{bmatrix}
-            0.7984 \\ 0.8656 \\ 0.6640
+            1.0 \\ 1.0 \\ 1.0
+        \end{bmatrix} - 0.01 \begin{bmatrix}
+            3.112 \\ 3.112 \\ 3.112
+        \end{bmatrix} = \begin{bmatrix}
+            0.968 \\ 0.968 \\ 0.968
         \end{bmatrix}
     \end{align*}
     Next, we find the gradient of the loss with respect to the bias term
     \begin{align*}
-        \frac{\partial \mathcal{L}}{\partial b} &= \left( \frac{\partial \mathcal{L}}{\partial \mathbf{y}}  \frac{\partial \mathbf{y}}{\partial b} \right)^{T} \\
+        \frac{\partial \mathcal{L}}{\partial b} &= \left( \frac{\partial \mathbf{y}}{\partial b} \right)^{T} \frac{\partial \mathcal{L}}{\partial \mathbf{y}} \\
         \frac{\partial \mathbf{y}}{\partial b} &= \frac{\partial}{\partial b} (A_{1} W_{2} + b) = \mathbf{1}
     \end{align*}
     So, the updated bias term becomes
     \begin{align*}
-        b = b - \eta \frac{\partial \mathcal{L}}{\partial b} &= b - \eta \left( \begin{bmatrix}
-            0.4 & -0.06 & 1.34
+        b = b - \eta \frac{\partial \mathcal{L}}{\partial b} &= b - \eta \begin{bmatrix}
+            1 & 1 & 1
         \end{bmatrix} \begin{bmatrix}
-            1 \\ 1 \\ 1
-        \end{bmatrix} \right)^{T} = 0 - 0.1 * 1.68 = -0.168
+            -0.4 \\ 0.06 \\ -1.34
+        \end{bmatrix} = 0 - 0.01 * (-1.68) = 0.0168
     \end{align*}
     Next, we find the gradient of the loss with respect to the hidden layer weights. This is given by
     \begin{align*}
-        \frac{\partial \mathcal{L}}{\partial W_{1}} &= \frac{\partial \mathcal{L}}{\partial \mathbf{y}} \frac{\partial \mathbf{y}}{\partial Z_{1}} \left( \frac{\partial Z_{1}}{\partial W_{1}} \right)^{T} \\
-        \frac{\partial \mathbf{y}}{\partial Z_{1}} &= \frac{\partial}{\partial Z_{1}} (A_{1} W_{2} + b) = W_{2} \\
+        \frac{\partial \mathcal{L}}{\partial W_{1}} &= \left( \frac{\partial Z_{1}}{\partial W_{1}} \right)^{T} \frac{\partial \mathbf{y}}{\partial Z_{1}} \left( \frac{\partial \mathcal{L}}{\partial \mathbf{y}} \right)^{T}  \\
+        \frac{\partial \mathbf{y}}{\partial Z_{1}} &= \frac{\partial}{\partial Z_{1}} (A_{1} W_{2} + b) = W_{2} * 1 = W_{2} \\
         \frac{\partial Z_{1}}{\partial W_{1}} &= \frac{\partial}{\partial W_{1}} (\mathbf{x} W_{1} + h) = \mathbf{x}
     \end{align*}
     So, the updated weights $W_{1}$ are
     \begin{align*}
         W_{1} = W_{1} - \eta \frac{\partial \mathcal{L}}{\partial W_{1}} &= W_{1} - \eta \left( \begin{bmatrix}
-            0.4 & -0.06 & 1.34
-        \end{bmatrix} \begin{bmatrix}
-            0.7984 \\ 0.8656 \\ 0.6640
-        \end{bmatrix} \right) \begin{bmatrix}
             1.2 & 0.8 & 2.0
+        \end{bmatrix} \begin{bmatrix}
+            0.968 \\ 0.968 \\ 0.968
+        \end{bmatrix} \right) \begin{bmatrix}
+            0.4 & -0.06 & 1.34
         \end{bmatrix} \\
         &= \begin{bmatrix}
             1.0 & 1.0 & 1.0
-        \end{bmatrix} - 0.1 \begin{bmatrix}
-            1.389 & 0.925 & 2.314
+        \end{bmatrix} - 0.01 \begin{bmatrix}
+            0.86 & -0.23 & 5.18
         \end{bmatrix} = \begin{bmatrix}
-            0.86 & 0.90 & 0.76
+            0.99 & 1.02 & 0.94
         \end{bmatrix}
     \end{align*}
     Finally, we find the gradient of the loss with respect to the bias term of the hidden layer.
     This is given by
     \begin{align*}
-        \frac{\partial \mathcal{L}}{\partial h} &= \frac{\partial \mathcal{L}}{\partial \mathbf{y}} \frac{\partial \mathbf{y}}{\partial Z_{1}} \left( \frac{\partial Z_{1}}{\partial h} \right)^{T} \\
+        \frac{\partial \mathcal{L}}{\partial h} &= \frac{\partial \mathcal{L}}{\partial \mathbf{y}} \left( \frac{\partial \mathbf{y}}{\partial Z_{1}} \right)^{T} \frac{\partial Z_{1}}{\partial h} \\
         \frac{\partial Z_{1}}{\partial h} &= \frac{\partial}{\partial h} (\mathbf{x} W_{1} + h) = \mathbf{1}
     \end{align*}
     So, the updated bias term $h$ is
     \begin{align*}
-        h = h - \eta \frac{\partial \mathcal{L}}{\partial h} &= h - \eta \left( \begin{bmatrix}
-            0.4 & -0.06 & 1.34
+        h = h - \eta \frac{\partial \mathcal{L}}{\partial h} &= h - \eta \begin{bmatrix}
+            0.4 \\ -0.06 \\ 1.34
+        \end{bmatrix} \left( \begin{bmatrix}
+            0.968 & 0.968 & 0.968
         \end{bmatrix} \begin{bmatrix}
-            0.7984 \\ 0.8656 \\ 0.6640
-        \end{bmatrix} \right) \begin{bmatrix}
-            1
-        \end{bmatrix} = 0 - 0.1 * 1.157 = -0.1157
+            1 \\ 1 \\ 1
+        \end{bmatrix} \right) \\ &= \begin{bmatrix}
+            0 \\ 0 \\ 0
+        \end{bmatrix} - 0.01 * \begin{bmatrix}
+            1.16 \\ -0.17 \\ 3.89
+        \end{bmatrix} = \begin{bmatrix}
+            -0.0116 \\ 0.0017 \\ -0.0389
+        \end{bmatrix}
     \end{align*}
 
     \subsection*{Solution 2 (2 marks)}
@@ -389,4 +390,12 @@
         \item \href{https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html}{\color{blue}\underline{\texttt{MLPClassifier} in Sci-kit Learn (Official Documentation)}}
     \end{enumerate}
 
-\end{document}
+
+
+
+
+
+
+
+
+    \end{document}
